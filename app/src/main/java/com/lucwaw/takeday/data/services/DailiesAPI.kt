@@ -1,7 +1,6 @@
 package com.lucwaw.takeday.data.services
 
 import com.lucwaw.takeday.data.Dailies
-import java.sql.Date
 
 interface DailiesAPI {
     suspend fun getDailies(): List<Dailies>

@@ -1,17 +1,31 @@
 package com.lucwaw.takeday.repository
 
+import com.lucwaw.takeday.data.services.DailiesAPI
+import com.lucwaw.takeday.domain.model.Dailies
 import javax.inject.Singleton
 
 @Singleton
-class HabitRepository(habitApi : HabitApi) {
-    // This class will handle the data operations for habits.
-    // It can interact with a local database, remote server, or any other data source.
-    // For now, it is just a placeholder and does not contain any methods or properties.
+class HabitRepository(private val dailiesAPI: DailiesAPI) {
+    suspend fun getDailies(): List<Dailies> =
+        //for each daily, convert it to domain model
+        dailiesAPI.getDailies().map { it.toDomain() }
 
-    // You can add methods to fetch, add, update, or delete habits here.
-    // For example:
-    // fun getHabits(): List<Habit> { ... }
-    // fun addHabit(habit: Habit) { ... }
-    // fun updateHabit(habit: Habit) { ... }
-    // fun deleteHabit(habitId: String) { ... }
+    suspend fun getDaily(date: String): Dailies? = dailiesAPI.getDaily(date)?.toDomain()
+
+    suspend fun addDaily(daily: Dailies): Dailies =
+        dailiesAPI.addDaily(daily.toDAO()).toDomain()
+
+    suspend fun updateDailyFromDate(
+        date: String,
+        dailyUpdated: Dailies
+    ): Dailies = dailiesAPI.updateDailyFromDate(date, dailyUpdated.toDAO()).toDomain()
+
+    suspend fun deleteDaily(date: String) {
+        dailiesAPI.deleteDaily(date)
+    }
+
+    suspend fun deleteAllDaily() {
+        dailiesAPI.deleteAllDaily()
+    }
+
 }
