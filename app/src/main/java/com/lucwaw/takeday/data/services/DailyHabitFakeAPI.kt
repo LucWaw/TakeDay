@@ -8,8 +8,8 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 class DailyHabitFakeAPI : DailiesAPI {
-    val firstMedicine = Medicine("name1")
-    val secondMedicine = Medicine("name2")
+    val firstMedicine = Medicine("Abilify")
+    val secondMedicine = Medicine("Fluoxétine", listOf("Abilify"))
     var firstTake = Take(firstMedicine, wasTaken = false)
     var secondTake = Take(secondMedicine, wasTaken = false)
     var habit = Habit(firstTake to secondTake, time = LocalTime.now().toString())
@@ -44,6 +44,8 @@ class DailyHabitFakeAPI : DailiesAPI {
         val dailyToUpdate = listOFDailies.find { it.date == date }
             ?: throw NoSuchElementException("No daily found for date: $date")
         listOFDailies = listOFDailies - dailyToUpdate + dailyUpdated
+        println("Updated medicine: $listOFDailies")
+
         return dailyUpdated
     }
 

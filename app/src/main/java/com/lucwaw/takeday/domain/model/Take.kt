@@ -3,7 +3,7 @@ package com.lucwaw.takeday.domain.model
 import com.lucwaw.takeday.data.Take
 
 
-data class Take(val medicine: Medicine) {
+data class Take(val medicine: Medicinal) {
     var wasTaken: Boolean = false
 
     fun setIsTaken(value: Boolean) {

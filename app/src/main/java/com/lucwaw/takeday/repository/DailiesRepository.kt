@@ -2,10 +2,11 @@ package com.lucwaw.takeday.repository
 
 import com.lucwaw.takeday.data.services.DailiesAPI
 import com.lucwaw.takeday.domain.model.Dailies
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class HabitRepository(private val dailiesAPI: DailiesAPI) {
+class DailiesRepository @Inject constructor(private val dailiesAPI: DailiesAPI) {
     suspend fun getDailies(): List<Dailies> =
         //for each daily, convert it to domain model
         dailiesAPI.getDailies().map { it.toDomain() }

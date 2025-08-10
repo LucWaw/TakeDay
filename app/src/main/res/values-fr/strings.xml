@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DailyDose</string>
+    <string name="go_back">Retour arrière</string>
+    <string name="add_a_medicine">Ajouter un medicament</string>
+    <string name="add_medicine">Ajouter un medicament</string>
+    <string name="medicine_name">Médicament</string>
+    <string name="enter_medicine_name">Entrer le nom complet ici</string>
+    <string name="add">Ajouter</string>
+</resources>
