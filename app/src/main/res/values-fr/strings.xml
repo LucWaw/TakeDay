@@ -6,4 +6,5 @@
     <string name="medicine_name">Médicament</string>
     <string name="enter_medicine_name">Entrer le nom complet ici</string>
     <string name="add">Ajouter</string>
+    <string name="select_medicines">Sélectionnez les médicaments affichés et supprimez-les.</string>
 </resources>

@@ -1,5 +1,8 @@
 package com.lucwaw.takeday.ui.dailies
 
-data class DailiesState(
-    var dailies : List<com.lucwaw.takeday.domain.model.Dailies> = emptyList(),
+import com.lucwaw.takeday.domain.model.Row
+
+data class UiState(
+    val headers: List<String> = emptyList(), // "date", "time", puis noms des médicaments
+    val table: List<Row> = emptyList()
 )

@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.serialization)
+    alias(libs.plugins.room)
 }
 
 android {
@@ -40,12 +41,22 @@ android {
         jvmTarget = "1.8"
     }
 
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
+
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
+    //ROOM
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.gson)
 
     implementation(libs.androidx.navigation.compose)
 

@@ -1,75 +1,98 @@
 package com.lucwaw.takeday.ui.dailies
 
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lucwaw.takeday.repository.DailiesRepository
+import com.lucwaw.takeday.domain.model.Row
+import com.lucwaw.takeday.domain.model.TriState
+import com.lucwaw.takeday.repository.TableRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalTime
+import javax.inject.Inject
 
 
-sealed interface DailiesEvent {
-    data class TakeFirstMedicine(val date: LocalDate, val isTaken : Boolean) : DailiesEvent
-    data class TakeSecondMedicine(val date: LocalDate, val isTaken : Boolean) : DailiesEvent
-    data class PutTakeTime(val date: LocalDate, val takeTime: LocalTime) : DailiesEvent
+// Events
+sealed class TableEvent {
+    data class NoteMedicine(val rowIndex: Int, val medicineName: String, val note: TriState) :
+        TableEvent()
+    data class TimeChanged(val rowIndex: Int, val time: LocalTime) : TableEvent()
 }
 
 @HiltViewModel
-class DailiesViewModel @Inject constructor(private val repository: DailiesRepository) :
-    ViewModel() {
-    var state by mutableStateOf(DailiesState())
-        private set
+class TableViewModel @Inject constructor(private val repository: TableRepository) : ViewModel() {
+    private val _uiState = mutableStateOf(
+        UiState()
+    )
+
+    val uiState: State<UiState> = _uiState
 
     init {
         viewModelScope.launch {
-            state.dailies = repository.getDailies()
+            val rows = repository.getAllRows()
+            val today = LocalDate.now()
+
+            // Check if today's date already exists
+            val existsToday = rows.any { it.date == today }
+
+            val newRow = if (!existsToday) {
+                Row(
+                    date = today,
+                    time = null,
+                    medicines = emptyMap() // No medicine
+                ).also { repository.upsertRow(it) }
+            } else null
+
+            val currentRows = if (newRow != null) rows + newRow else rows
+
+            val medicineHeaders = currentRows //TODO Modifier pour les medecines selectionné uniquement
+                .flatMap { it.medicines.keys }
+                .distinct()
+
+            _uiState.value = UiState(
+                headers = listOf("Date", "Time") + medicineHeaders,
+                table = currentRows
+            )
         }
     }
 
-    fun onEvent(event: DailiesEvent) {
+
+
+    fun onEvent(event: TableEvent) {
         when (event) {
-            is DailiesEvent.TakeFirstMedicine -> {
-                val dailyIndex = state.dailies.indexOfFirst { it.date == event.date }
-                state.dailies[dailyIndex].habit.take.first.setIsTaken(event.isTaken)
-                viewModelScope.launch {
-                    val updatedOne = repository.updateDailyFromDate(event.date.toString(), state.dailies[dailyIndex])
-                    state.copy(
-                        dailies = state.dailies.mapIndexed { index, daily ->
-                            if (index == dailyIndex) updatedOne else daily
+            is TableEvent.NoteMedicine -> {
+                val updatedTable = _uiState.value.table.mapIndexed { index, row ->
+                    if (index == event.rowIndex) {
+                        val updatedMedicines = row.medicines.toMutableMap()
+                        updatedMedicines[event.medicineName] =
+                            event.note
+                        val updatedRow = row.copy(medicines = updatedMedicines)
+                        viewModelScope.launch {
+                            repository.upsertRow(
+                                updatedRow
+                            )
                         }
-                    )
+                        updatedRow
+                    } else row
                 }
+                _uiState.value = _uiState.value.copy(table = updatedTable)
             }
 
-            is DailiesEvent.TakeSecondMedicine -> {
-                val dailyIndex = state.dailies.indexOfFirst { it.date == event.date }
-                state.dailies[dailyIndex].habit.take.second.setIsTaken(event.isTaken)
-                viewModelScope.launch {
-                    val updatedOne = repository.updateDailyFromDate(event.date.toString(), state.dailies[dailyIndex])
-                    state.copy(
-                        dailies = state.dailies.mapIndexed { index, daily ->
-                            if (index == dailyIndex) updatedOne else daily
+            is TableEvent.TimeChanged -> {
+                val updatedTable = _uiState.value.table.mapIndexed { index, row ->
+                    if (index == event.rowIndex) {
+                        val updatedRow = row.copy(time = event.time)
+                        viewModelScope.launch {
+                            repository.upsertRow(
+                                updatedRow
+                            )
                         }
-                    )
+                        updatedRow
+                    } else row
                 }
-            }
-
-            is DailiesEvent.PutTakeTime -> {
-                val dailyIndex = state.dailies.indexOfFirst { it.date == event.date }
-                state.dailies[dailyIndex].habit.time = event.takeTime
-                viewModelScope.launch {
-                    val updatedOne = repository.updateDailyFromDate(event.date.toString(), state.dailies[dailyIndex])
-                    state.copy(
-                        dailies = state.dailies.mapIndexed { index, daily ->
-                            if (index == dailyIndex) updatedOne else daily
-                        }
-                    )
-                }
+                _uiState.value = _uiState.value.copy(table = updatedTable)
             }
         }
     }
