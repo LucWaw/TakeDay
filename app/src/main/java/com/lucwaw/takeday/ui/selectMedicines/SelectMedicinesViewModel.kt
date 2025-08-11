@@ -3,8 +3,10 @@ package com.lucwaw.takeday.ui.selectMedicines
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.lucwaw.takeday.ui.dailies.UiState
+import androidx.lifecycle.viewModelScope
+import com.lucwaw.takeday.repository.TableRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class SelectMedicinesEvent {
@@ -14,7 +16,7 @@ sealed class SelectMedicinesEvent {
 
 @HiltViewModel
 class SelectMedicinesViewModel @Inject constructor(
-    private val repository: SelectMedicinesRepository
+    private val repository: TableRepository
 ) : ViewModel() {
     private val _uiState = mutableStateOf(
         SelectMedicinesState()
@@ -23,25 +25,51 @@ class SelectMedicinesViewModel @Inject constructor(
     val uiState: State<SelectMedicinesState> = _uiState
 
     init {
-        loadMedicines()
+        loadSelectedMedicines()
     }
 
-    private fun loadMedicines() {
-        _uiState.value = _uiState.value.copy(
-            medicines = repository.getAllMedicines().map { it.name },
-        )
+    fun loadSelectedMedicines() {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                medicines = repository.getAllMedicines()
+            )
+        }
+
     }
 
     fun onEvent(event: SelectMedicinesEvent) {
         when (event) {
-            is SelectMedicinesEvent.MedicineSelected -> {
-                repository.addMedicine(event.medicineName)
-                loadMedicines()
+            is SelectMedicinesEvent.MedicineToggle -> {
+                val currentMedicines = _uiState.value.medicines
+                val currentSelection = currentMedicines.find { it.name == event.medicineName }?.isSelected == true
+                val newSelection = !currentSelection
+                val updatedMedicines = currentMedicines.map { medicine ->
+                    if (medicine.name == event.medicineName) {
+                        medicine.copy(isSelected = newSelection)
+                    } else {
+                        medicine
+                    }
+                }
+
+                _uiState.value = _uiState.value.copy(
+                    medicines = updatedMedicines
+                )
+                viewModelScope.launch {
+                    repository.upsertMedicine(
+                        name = event.medicineName,
+                        isSelected = newSelection
+                    )
+                    loadSelectedMedicines()
+                }
             }
             is SelectMedicinesEvent.DeleteMedicine -> {
-                repository.removeMedicine(event.medicineName)
-                loadMedicines()
+                viewModelScope.launch {
+                    repository.removeMedicineByName(event.medicineName)
+                    loadSelectedMedicines()
+                }
+
             }
+
         }
     }
 }

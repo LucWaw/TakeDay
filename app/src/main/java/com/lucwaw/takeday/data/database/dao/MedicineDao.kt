@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Upsert
 import com.lucwaw.takeday.data.database.entities.MedicineEntity
 
 @Dao
@@ -12,9 +13,9 @@ interface MedicineDao {
     @Query("SELECT * FROM medicines ORDER BY name ASC")
     suspend fun getAll(): List<MedicineEntity>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(medicine: MedicineEntity): Long
+    @Upsert
+    suspend fun upsert(medicine: MedicineEntity)
 
-    @Delete
-    suspend fun delete(medicine: MedicineEntity)
+    @Query("Delete FROM medicines WHERE name = :medicineName")
+    suspend fun deleteByName(medicineName: String)
 }

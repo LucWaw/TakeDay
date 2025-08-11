@@ -11,7 +11,6 @@ class TableRepository @Inject constructor(
     private val rowDao: RowDao,
     private val medicineDao: MedicineDao
 ) {
-
     suspend fun getAllMedicines(): List<MedicineEntity> = medicineDao.getAll()
 
     suspend fun getAllRows(): List<Row> = rowDao.getAll().map { entity ->
@@ -22,13 +21,9 @@ class TableRepository @Inject constructor(
         rowDao.upsert(RowEntity(row.date, row.time, row.medicines))
     }
 
-    suspend fun addMedicine(name: String) {
-        medicineDao.insert(MedicineEntity(name = name))
-    }
-
-    suspend fun removeMedicine(medicine: MedicineEntity) {
-        medicineDao.delete(medicine)
-        removeMedicineFromRows(medicine.name)
+    suspend fun removeMedicineByName(medicineName: String) {
+        medicineDao.deleteByName(medicineName)
+        removeMedicineFromRows(medicineName)
     }
 
     private suspend fun removeMedicineFromRows(medicineName: String) {
@@ -40,6 +35,12 @@ class TableRepository @Inject constructor(
                 rowDao.upsert(entity.copy(medicines = updatedMap))
             }
         }
+    }
+
+    suspend fun upsertMedicine(name : String, isSelected: Boolean = true) {
+        val medicine = MedicineEntity(name, isSelected)
+        medicineDao.upsert(medicine)
+
     }
 }
 

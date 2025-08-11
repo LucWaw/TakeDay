@@ -47,13 +47,20 @@ class TableViewModel @Inject constructor(private val repository: TableRepository
 
             val currentRows = if (newRow != null) rows + newRow else rows
 
-            val medicineHeaders = currentRows //TODO Modifier pour les medecines selectionné uniquement
-                .flatMap { it.medicines.keys }
-                .distinct()
+            val medicineHeaders = repository.getAllMedicines().filter { it.isSelected }.map { it.name }
 
             _uiState.value = UiState(
                 headers = listOf("Date", "Time") + medicineHeaders,
                 table = currentRows
+            )
+        }
+    }
+
+    fun loadMedicines() {
+        viewModelScope.launch {
+            val medicineHeaders = repository.getAllMedicines().filter { it.isSelected }.map { it.name }
+            _uiState.value = _uiState.value.copy(
+                headers = listOf("Date", "Time") + medicineHeaders
             )
         }
     }

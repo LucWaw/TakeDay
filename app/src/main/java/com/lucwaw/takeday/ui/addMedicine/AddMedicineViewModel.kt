@@ -35,7 +35,7 @@ class AddMedicineViewModel @Inject constructor(private val repository: TableRepo
             is AddMedicineEvent.SendMedicine -> {
                 viewModelScope.launch {
 
-                    val newMedicine = repository.addMedicine(state.medicineName)
+                    repository.upsertMedicine(state.medicineName)
                     state = state.copy(
                         medicines = state.medicines + state.medicineName,
                         medicineName = "",

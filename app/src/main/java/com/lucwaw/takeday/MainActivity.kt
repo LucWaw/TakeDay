@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lucwaw.takeday.ui.AddMedicine
 import com.lucwaw.takeday.ui.Home
+import com.lucwaw.takeday.ui.SelectMedicines
 import com.lucwaw.takeday.ui.selectMedicines.SelectMedicines
 import com.lucwaw.takeday.ui.addMedicine.AddMedicineScreenRoot
 import com.lucwaw.takeday.ui.dailies.DailiesScreenRoot
