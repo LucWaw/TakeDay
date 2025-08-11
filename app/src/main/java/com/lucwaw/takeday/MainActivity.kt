@@ -1,7 +1,6 @@
 package com.lucwaw.takeday
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -10,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lucwaw.takeday.ui.AddMedicine
 import com.lucwaw.takeday.ui.Home
+import com.lucwaw.takeday.ui.selectMedicines.SelectMedicines
 import com.lucwaw.takeday.ui.addMedicine.AddMedicineScreenRoot
 import com.lucwaw.takeday.ui.dailies.DailiesScreenRoot
 import com.lucwaw.takeday.ui.theme.TakeDayTheme
@@ -32,16 +32,26 @@ class MainActivity : ComponentActivity() {
                         DailiesScreenRoot(
                             goToAddScreen =
                                 {
-                                    Log.d("NAVIGATION", "Navigating to AddMedicine")
                                     navController.navigate(
                                         AddMedicine
                                     )
-                                }
+                                },
+                            goToSelectMedicines = {
+                                    navController.navigate(SelectMedicines)
+                            }
                         )
                     }
                     composable<AddMedicine> {
                         AddMedicineScreenRoot(
                             goBack = { navController.popBackStack() }
+                        )
+                    }
+                    composable<SelectMedicines> {
+                        SelectMedicines(
+                            goBack = { navController.popBackStack() },
+                            goToAddMedicine = {
+                                navController.navigate(AddMedicine)
+                            }
                         )
                     }
                 }

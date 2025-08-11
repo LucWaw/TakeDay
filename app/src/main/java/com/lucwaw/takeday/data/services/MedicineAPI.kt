@@ -1,5 +1,5 @@
 package com.lucwaw.takeday.data.services
-
+/*
 interface MedicineAPI {
     suspend fun getMedicines(): List<com.lucwaw.takeday.data.Medicine>
 
@@ -12,4 +12,4 @@ interface MedicineAPI {
     suspend fun deleteMedicine(name: String)
 
     suspend fun deleteAllMedicines()
-}
+}*/

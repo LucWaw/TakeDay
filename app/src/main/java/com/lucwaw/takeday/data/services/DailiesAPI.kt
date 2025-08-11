@@ -1,7 +1,5 @@
 package com.lucwaw.takeday.data.services
-
-import com.lucwaw.takeday.data.Dailies
-
+/*
 interface DailiesAPI {
     suspend fun getDailies(): List<Dailies>
 
@@ -17,4 +15,4 @@ interface DailiesAPI {
     suspend fun deleteDaily(date: String)
 
     suspend fun deleteAllDaily()
-}
+}*/

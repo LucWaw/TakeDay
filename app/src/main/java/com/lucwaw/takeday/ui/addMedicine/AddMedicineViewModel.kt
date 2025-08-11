@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lucwaw.takeday.repository.MedicineRepository
+import com.lucwaw.takeday.repository.TableRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.launch
@@ -18,13 +18,13 @@ sealed interface AddMedicineEvent {
 
 
 @HiltViewModel
-class AddMedicineViewModel @Inject constructor(private val repository: MedicineRepository) : ViewModel() {
+class AddMedicineViewModel @Inject constructor(private val repository: TableRepository) : ViewModel() {
     var state by mutableStateOf(MedicinesState())
         private set
 
     init {
         viewModelScope.launch {
-            state.medicines = repository.getMedicines().map {
+            state.medicines = repository.getAllMedicines().map {
                 it.name
             }
         }
@@ -37,7 +37,7 @@ class AddMedicineViewModel @Inject constructor(private val repository: MedicineR
 
                     val newMedicine = repository.addMedicine(state.medicineName)
                     state = state.copy(
-                        medicines = state.medicines + newMedicine.name,
+                        medicines = state.medicines + state.medicineName,
                         medicineName = "",
                         error = false
                     )

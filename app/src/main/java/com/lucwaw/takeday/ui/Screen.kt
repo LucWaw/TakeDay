@@ -7,3 +7,6 @@ object Home
 
 @Serializable
 object AddMedicine
+
+@Serializable
+object SelectMedicines

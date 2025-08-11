@@ -1,16 +1,10 @@
 package com.lucwaw.takeday.data.services
-
-import android.util.Log
-import com.lucwaw.takeday.data.Medicine
-
+/*
 class MedicineFakeAPI : MedicineAPI {
 
     private val medicines = mutableListOf<Medicine>(
-        Medicine("Aspirin"),
-        Medicine("Ibuprofen"),
-        Medicine("Paracetamol"),
-        Medicine("Amoxicillin"),
-        Medicine("Metformin")
+        Medicine("Abilify"),
+        Medicine("Fluoxétine")
     )
 
     override suspend fun getMedicines(): List<Medicine> {
@@ -51,4 +45,4 @@ class MedicineFakeAPI : MedicineAPI {
     }
 
 
-}
+}*/

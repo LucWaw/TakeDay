@@ -1,18 +1,14 @@
 package com.lucwaw.takeday.data.services
 
-import com.lucwaw.takeday.data.Dailies
-import com.lucwaw.takeday.data.Habit
-import com.lucwaw.takeday.data.Medicine
-import com.lucwaw.takeday.data.Take
 import java.time.LocalDate
 import java.time.LocalTime
 
-class DailyHabitFakeAPI : DailiesAPI {
+/*class DailyHabitFakeAPI : DailiesAPI {
     val firstMedicine = Medicine("Abilify")
-    val secondMedicine = Medicine("Fluoxétine", listOf("Abilify"))
+    val secondMedicine = Medicine("Fluoxétine")
     var firstTake = Take(firstMedicine, wasTaken = false)
     var secondTake = Take(secondMedicine, wasTaken = false)
-    var habit = Habit(firstTake to secondTake, time = LocalTime.now().toString())
+    var habit = Habit(listOf(firstTake, secondTake), time = LocalTime.now().toString())
     var dailyHabit = Dailies(
         date = LocalDate.now().toString(),
         habit = habit
@@ -58,4 +54,4 @@ class DailyHabitFakeAPI : DailiesAPI {
     }
 
 
-}
+}*/
