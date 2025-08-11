@@ -41,7 +41,8 @@ class SelectMedicinesViewModel @Inject constructor(
         when (event) {
             is SelectMedicinesEvent.MedicineToggle -> {
                 val currentMedicines = _uiState.value.medicines
-                val currentSelection = currentMedicines.find { it.name == event.medicineName }?.isSelected == true
+                val currentSelection =
+                    currentMedicines.find { it.name == event.medicineName }?.isSelected == true
                 val newSelection = !currentSelection
                 val updatedMedicines = currentMedicines.map { medicine ->
                     if (medicine.name == event.medicineName) {
@@ -62,6 +63,7 @@ class SelectMedicinesViewModel @Inject constructor(
                     loadSelectedMedicines()
                 }
             }
+
             is SelectMedicinesEvent.DeleteMedicine -> {
                 viewModelScope.launch {
                     repository.removeMedicineByName(event.medicineName)

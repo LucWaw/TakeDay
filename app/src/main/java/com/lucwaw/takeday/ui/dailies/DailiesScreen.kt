@@ -10,11 +10,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -40,14 +38,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lucwaw.takeday.R
 import com.lucwaw.takeday.domain.model.TriState
@@ -62,7 +57,7 @@ import java.util.Locale
 fun DailiesScreenRoot(goToAddScreen: () -> Unit, goToSelectMedicines: () -> Unit) {
     val viewModel = hiltViewModel<TableViewModel>()
     LaunchedEffect(true) {
-        viewModel.loadMedicines()
+        viewModel.updateTable()
     }
     DailiesScreen(
         state = viewModel.uiState.value,
@@ -202,84 +197,84 @@ fun TableContent(
 
 
 
-    LazyColumn() {
+    LazyColumn {
         items(state.table.size) { rowIndex ->
             val row = state.table[rowIndex]
             Row(
                 modifier = Modifier
                     .horizontalScroll(scrollState)
-                    ) {
-            state.headers.forEach { header ->
-                when (header) {
-                    "Date" -> Text(
-                        text = row.date.toHumanDate(),
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        modifier = Modifier
-                            .width(width)
-                            .padding(8.dp)
-                            .align(Alignment.CenterVertically)
-                    )
-
-                    "Time" ->
-                        Box(
-                            modifier = Modifier
-                                .width(width)
-                                .padding(8.dp)
-                                .align(Alignment.CenterVertically)
-                        ) {
-                            Text(
-                                text = row.time?.toHumanTime() ?: "HH:MM",
-                                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                                modifier = Modifier
-                                    .align(Alignment.Center)
-                            )
-                            Box(
-                                modifier = Modifier
-                                    .matchParentSize()
-                                    .alpha(0f)
-                                    .clickable(onClick = {
-                                        showDialWithTimeDialog = true
-                                        indexTimePicker = rowIndex
-                                    }),
-                            )
-
-                        }
-
-                    else -> {
-
-
-                        TriStateCheckbox(
-                            state = (row.medicines[header]?.let {
-                                when (it) {
-                                    TriState.TAKEN -> ToggleableState.On
-                                    TriState.NOTTAKEN -> ToggleableState.Indeterminate
-                                    TriState.EMPTY -> ToggleableState.Off
-                                }
-                            } ?: ToggleableState.Off),
-                            onClick = {
-                                onEvent(
-                                    TableEvent.NoteMedicine(
-                                        rowIndex = rowIndex,
-                                        medicineName = header,
-                                        note = when (row.medicines[header]) {
-                                            TriState.TAKEN -> TriState.NOTTAKEN
-                                            TriState.NOTTAKEN -> TriState.EMPTY
-                                            TriState.EMPTY -> TriState.TAKEN
-                                            null -> TriState.TAKEN
-                                        }
-                                    )
-                                )
-
-                            },
+            ) {
+                state.headers.forEach { header ->
+                    when (header) {
+                        "Date" -> Text(
+                            text = row.date.toHumanDate(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                             modifier = Modifier
                                 .width(width)
                                 .padding(8.dp)
                                 .align(Alignment.CenterVertically)
                         )
+
+                        "Time" ->
+                            Box(
+                                modifier = Modifier
+                                    .width(width)
+                                    .padding(8.dp)
+                                    .align(Alignment.CenterVertically)
+                            ) {
+                                Text(
+                                    text = row.time?.toHumanTime() ?: "HH:MM",
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                                    modifier = Modifier
+                                        .align(Alignment.Center)
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .matchParentSize()
+                                        .alpha(0f)
+                                        .clickable(onClick = {
+                                            showDialWithTimeDialog = true
+                                            indexTimePicker = rowIndex
+                                        }),
+                                )
+
+                            }
+
+                        else -> {
+
+
+                            TriStateCheckbox(
+                                state = (row.medicines[header]?.let {
+                                    when (it) {
+                                        TriState.TAKEN -> ToggleableState.On
+                                        TriState.NOTTAKEN -> ToggleableState.Indeterminate
+                                        TriState.EMPTY -> ToggleableState.Off
+                                    }
+                                } ?: ToggleableState.Off),
+                                onClick = {
+                                    onEvent(
+                                        TableEvent.NoteMedicine(
+                                            rowIndex = rowIndex,
+                                            medicineName = header,
+                                            note = when (row.medicines[header]) {
+                                                TriState.TAKEN -> TriState.NOTTAKEN
+                                                TriState.NOTTAKEN -> TriState.EMPTY
+                                                TriState.EMPTY -> TriState.TAKEN
+                                                null -> TriState.TAKEN
+                                            }
+                                        )
+                                    )
+
+                                },
+                                modifier = Modifier
+                                    .width(width)
+                                    .padding(8.dp)
+                                    .align(Alignment.CenterVertically)
+                            )
+                        }
                     }
                 }
             }
-        }
         }
     }
     if (showDialWithTimeDialog) {

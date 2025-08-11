@@ -96,7 +96,11 @@ fun MedicineItem(
 ) {
     var dialogDelete by remember { mutableStateOf(false) }
 
-    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier.fillMaxSize()) {
+    Row(
+        verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        modifier = Modifier.fillMaxSize()
+    ) {
 
         Checkbox(
             checked = isSelected,
@@ -106,7 +110,8 @@ fun MedicineItem(
         Text(
             text = medicine,
             modifier = Modifier
-                .padding(8.dp).width(100.dp),
+                .padding(8.dp)
+                .width(100.dp),
         )
         IconButton(
             onClick = { dialogDelete = true }
@@ -117,11 +122,18 @@ fun MedicineItem(
             )
         }
 
-        if (dialogDelete){
+        if (dialogDelete) {
             AlertDialog(
                 onDismissRequest = { dialogDelete = false },
                 title = { Text(text = stringResource(R.string.popup_message_confirmation_delete_medicine)) },
-                text = { Text(text = stringResource(R.string.popup_message_confirmation_delete_medicine_text, medicine)) },
+                text = {
+                    Text(
+                        text = stringResource(
+                            R.string.popup_message_confirmation_delete_medicine_text,
+                            medicine
+                        )
+                    )
+                },
                 confirmButton = {
                     TextButton(onClick = {
                         onEvent(SelectMedicinesEvent.DeleteMedicine(medicine))

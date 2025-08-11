@@ -18,7 +18,8 @@ sealed interface AddMedicineEvent {
 
 
 @HiltViewModel
-class AddMedicineViewModel @Inject constructor(private val repository: TableRepository) : ViewModel() {
+class AddMedicineViewModel @Inject constructor(private val repository: TableRepository) :
+    ViewModel() {
     var state by mutableStateOf(MedicinesState())
         private set
 
@@ -45,8 +46,12 @@ class AddMedicineViewModel @Inject constructor(private val repository: TableRepo
             }
 
             is AddMedicineEvent.MedicineChanged -> {
-                Log.d("AddMedicineVM", "Before update: state.medicineName = '${state.medicineName}', event.medicineName = '${event.medicineName}'")
-                state.error = event.medicineName.isBlank() || state.medicines.any { it == event.medicineName }
+                Log.d(
+                    "AddMedicineVM",
+                    "Before update: state.medicineName = '${state.medicineName}', event.medicineName = '${event.medicineName}'"
+                )
+                state.error =
+                    event.medicineName.isBlank() || state.medicines.any { it == event.medicineName }
                 state = state.copy(medicineName = event.medicineName)
                 Log.d("AddMedicineVM", "After update: state.medicineName = '${state.medicineName}'")
             }

@@ -31,6 +31,10 @@ class TableViewModel @Inject constructor(private val repository: TableRepository
     val uiState: State<UiState> = _uiState
 
     init {
+        updateTable()
+    }
+
+    fun updateTable() {
         viewModelScope.launch {
             val rows = repository.getAllRows()
             // Create rows for each day from the first row to today, including today
@@ -45,19 +49,6 @@ class TableViewModel @Inject constructor(private val repository: TableRepository
             )
         }
     }
-
-    //TODO RECALL COMPLETE AT LAUC SCREEN
-
-    fun loadMedicines() {
-        viewModelScope.launch {
-            val medicineHeaders =
-                repository.getAllMedicines().filter { it.isSelected }.map { it.name }
-            _uiState.value = _uiState.value.copy(
-                headers = listOf("Date", "Time") + medicineHeaders
-            )
-        }
-    }
-
 
 
     /**

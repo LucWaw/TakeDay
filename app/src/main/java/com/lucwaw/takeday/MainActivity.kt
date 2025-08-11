@@ -10,9 +10,9 @@ import androidx.navigation.compose.rememberNavController
 import com.lucwaw.takeday.ui.AddMedicine
 import com.lucwaw.takeday.ui.Home
 import com.lucwaw.takeday.ui.SelectMedicines
-import com.lucwaw.takeday.ui.selectMedicines.SelectMedicines
 import com.lucwaw.takeday.ui.addMedicine.AddMedicineScreenRoot
 import com.lucwaw.takeday.ui.dailies.DailiesScreenRoot
+import com.lucwaw.takeday.ui.selectMedicines.SelectMedicines
 import com.lucwaw.takeday.ui.theme.TakeDayTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                                     )
                                 },
                             goToSelectMedicines = {
-                                    navController.navigate(SelectMedicines)
+                                navController.navigate(SelectMedicines)
                             }
                         )
                     }

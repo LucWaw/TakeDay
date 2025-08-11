@@ -21,6 +21,7 @@ class DateUtils {
             val formatter = DateTimeFormatter.ofPattern(pattern, Locale.getDefault())
             return this.format(formatter)
         }
+
         fun dateTimeFormater(): DateTimeFormatter {
             return when (Locale.getDefault().language) {
                 "fr" -> DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())

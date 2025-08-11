@@ -41,7 +41,7 @@ class TableRepository @Inject constructor(
         }
     }
 
-    suspend fun upsertMedicine(name : String, isSelected: Boolean = true) {
+    suspend fun upsertMedicine(name: String, isSelected: Boolean = true) {
         val medicine = MedicineEntity(name, isSelected)
         medicineDao.upsert(medicine)
 
