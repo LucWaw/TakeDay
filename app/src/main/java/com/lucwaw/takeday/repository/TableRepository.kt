@@ -34,6 +34,10 @@ class TableRepository @Inject constructor(
                 updatedMap.remove(medicineName)
                 rowDao.upsert(entity.copy(medicines = updatedMap))
             }
+            // If medicine and time are both null, we can remove the row
+            if (entity.time == null && entity.medicines.isEmpty()) {
+                rowDao.delete(entity)
+            }
         }
     }
 

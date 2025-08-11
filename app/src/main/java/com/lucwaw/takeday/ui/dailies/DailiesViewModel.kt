@@ -18,6 +18,7 @@ import javax.inject.Inject
 sealed class TableEvent {
     data class NoteMedicine(val rowIndex: Int, val medicineName: String, val note: TriState) :
         TableEvent()
+
     data class TimeChanged(val rowIndex: Int, val time: LocalTime) : TableEvent()
 }
 
@@ -32,39 +33,62 @@ class TableViewModel @Inject constructor(private val repository: TableRepository
     init {
         viewModelScope.launch {
             val rows = repository.getAllRows()
-            val today = LocalDate.now()
+            // Create rows for each day from the first row to today, including today
+            val completeRows = createUnExistingRowsFromUsageBeginningToToDay(rows)
 
-            // Check if today's date already exists
-            val existsToday = rows.any { it.date == today }
-
-            val newRow = if (!existsToday) {
-                Row(
-                    date = today,
-                    time = null,
-                    medicines = emptyMap() // No medicine
-                ).also { repository.upsertRow(it) }
-            } else null
-
-            val currentRows = if (newRow != null) rows + newRow else rows
-
-            val medicineHeaders = repository.getAllMedicines().filter { it.isSelected }.map { it.name }
+            val medicineHeaders =
+                repository.getAllMedicines().filter { it.isSelected }.map { it.name }
 
             _uiState.value = UiState(
                 headers = listOf("Date", "Time") + medicineHeaders,
-                table = currentRows
+                table = completeRows
             )
         }
     }
 
+    //TODO RECALL COMPLETE AT LAUC SCREEN
+
     fun loadMedicines() {
         viewModelScope.launch {
-            val medicineHeaders = repository.getAllMedicines().filter { it.isSelected }.map { it.name }
+            val medicineHeaders =
+                repository.getAllMedicines().filter { it.isSelected }.map { it.name }
             _uiState.value = _uiState.value.copy(
                 headers = listOf("Date", "Time") + medicineHeaders
             )
         }
     }
 
+
+
+    /**
+     * Creates a list of [Row] objects, filling in any missing dates between the earliest date
+     * present in the input `rows` and today's date.
+     *
+     * If a date within this range is not found in the input `rows`, a new [Row] is created for that date
+     * with `null` time and an empty map for medicines.
+     *
+     * If the input `rows` is empty, it will generate rows from today up to today (i.e., a single row for today).
+     *
+     * @param rows A list of existing [Row] objects, potentially with missing dates.
+     * @return A new list of [Row] objects that includes all dates from the earliest date in the input `rows`
+     * (or today if `rows` is empty) up to and including today. Existing rows are preserved, and missing
+     * dates are filled with default [Row] objects.
+     */
+    fun createUnExistingRowsFromUsageBeginningToToDay(rows: List<Row>): List<Row> {
+        val today = LocalDate.now()
+        val rowsByDate = rows.associateBy { it.date }
+        val startDate = rows.minOfOrNull { it.date } ?: today
+
+        return (0..today.toEpochDay() - startDate.toEpochDay()).reversed() // Include today
+            .map { startDate.plusDays(it) }
+            .map { currentDate ->
+                rowsByDate[currentDate] ?: Row(
+                    date = currentDate,
+                    time = null,
+                    medicines = emptyMap() // No medicine
+                )
+            }
+    }
 
 
     fun onEvent(event: TableEvent) {
