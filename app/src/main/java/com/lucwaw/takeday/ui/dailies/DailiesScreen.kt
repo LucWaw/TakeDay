@@ -130,7 +130,7 @@ fun Table(state: UiState, onEvent: (TableEvent) -> Unit, innerPadding: PaddingVa
     ) {
 
         TableHeader(scrollState = scrollState, headers = state.headers)
-        TableContent(state = state, onEvent = onEvent, scrollState = scrollState)
+        TableContent(state = state, onEvent = onEvent, headers = state.headers, scrollState = scrollState)
 
     }
 }
@@ -143,16 +143,26 @@ fun TableHeader(
     headers: List<String>
 ) {
     val width = 107.dp
+    val modifierRow = if (headers.size > 4){
+        modifier.horizontalScroll(scrollState)
+    } else {
+        modifier
+    }
+
+
+
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .horizontalScroll(scrollState)
+        modifier = modifierRow
             .background(Pink)
     ) {
+        val modifierBox = if (headers.size <= 4) {
+            Modifier.weight(1f)
+        } else {
+            Modifier.width(width)
+        }
         headers.forEach { header ->
             Box(
-                modifier = Modifier
-                    .width(width)
+                modifier = modifierBox
                     .padding(8.dp)
                     .align(Alignment.CenterVertically)
             ) {
@@ -183,9 +193,12 @@ fun TableHeader(
 @Composable
 fun TableContent(
     modifier: Modifier = Modifier,
+    headers: List<String>,
     state: UiState, onEvent: (TableEvent) -> Unit, scrollState: ScrollState
 ) {
     val width = 107.dp
+
+
 
     var showDialWithTimeDialog by remember { mutableStateOf(false) }
     var indexTimePicker by remember { mutableIntStateOf(0) }
@@ -197,28 +210,35 @@ fun TableContent(
 
 
 
-    LazyColumn {
+    LazyColumn(modifier = modifier) {
         items(state.table.size) { rowIndex ->
             val row = state.table[rowIndex]
+            val modifierRow = if (headers.size > 4) {
+                modifier.horizontalScroll(scrollState)
+            } else {
+                modifier
+            }
             Row(
-                modifier = Modifier
-                    .horizontalScroll(scrollState)
+                modifier = modifierRow
             ) {
+                val modifierItems = if (headers.size <= 4) {
+                    Modifier.weight(1f)
+                } else {
+                    Modifier.width(width)
+                }
                 state.headers.forEach { header ->
                     when (header) {
                         "Date" -> Text(
                             text = row.date.toHumanDate(),
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            modifier = Modifier
-                                .width(width)
+                            modifier = modifierItems
                                 .padding(8.dp)
                                 .align(Alignment.CenterVertically)
                         )
 
                         "Time" ->
                             Box(
-                                modifier = Modifier
-                                    .width(width)
+                                modifier = modifierItems
                                     .padding(8.dp)
                                     .align(Alignment.CenterVertically)
                             ) {
@@ -266,8 +286,7 @@ fun TableContent(
                                     )
 
                                 },
-                                modifier = Modifier
-                                    .width(width)
+                                modifier = modifierItems
                                     .padding(8.dp)
                                     .align(Alignment.CenterVertically)
                             )
