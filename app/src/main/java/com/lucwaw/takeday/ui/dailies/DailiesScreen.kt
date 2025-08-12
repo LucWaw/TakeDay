@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -130,7 +129,12 @@ fun Table(state: UiState, onEvent: (TableEvent) -> Unit, innerPadding: PaddingVa
     ) {
 
         TableHeader(scrollState = scrollState, headers = state.headers)
-        TableContent(state = state, onEvent = onEvent, headers = state.headers, scrollState = scrollState)
+        TableContent(
+            state = state,
+            onEvent = onEvent,
+            headers = state.headers,
+            scrollState = scrollState
+        )
 
     }
 }
@@ -143,7 +147,7 @@ fun TableHeader(
     headers: List<String>
 ) {
     val width = 107.dp
-    val modifierRow = if (headers.size > 4){
+    val modifierRow = if (headers.size > 4) {
         modifier.horizontalScroll(scrollState)
     } else {
         modifier
@@ -197,7 +201,6 @@ fun TableContent(
     state: UiState, onEvent: (TableEvent) -> Unit, scrollState: ScrollState
 ) {
     val width = 107.dp
-
 
 
     var showDialWithTimeDialog by remember { mutableStateOf(false) }
