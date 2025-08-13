@@ -8,7 +8,7 @@ import com.lucwaw.takeday.data.database.dao.RowDao
 import com.lucwaw.takeday.data.database.entities.MedicineEntity
 import com.lucwaw.takeday.data.database.entities.RowEntity
 
-@Database(entities = [RowEntity::class, MedicineEntity::class], version = 1)
+@Database(entities = [RowEntity::class, MedicineEntity::class], version = 2, exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun rowDao(): RowDao

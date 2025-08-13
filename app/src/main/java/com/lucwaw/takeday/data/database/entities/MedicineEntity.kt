@@ -5,7 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "medicines")
 data class MedicineEntity(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
     val name: String,
     val isSelected: Boolean
 )

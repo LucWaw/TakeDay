@@ -4,6 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lucwaw.takeday.domain.model.Medicine
 import com.lucwaw.takeday.repository.TableRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -57,16 +58,22 @@ class SelectMedicinesViewModel @Inject constructor(
                 )
                 viewModelScope.launch {
                     repository.upsertMedicine(
-                        name = event.medicineName,
-                        isSelected = newSelection
+                        Medicine(
+                            name = event.medicineName,
+                            isSelected = newSelection,
+                            id = currentMedicines.find { it.name == event.medicineName }?.id ?: -1
+                        )
                     )
                     loadSelectedMedicines()
                 }
             }
 
             is SelectMedicinesEvent.DeleteMedicine -> {
+                val currentMedicines = _uiState.value.medicines
+                val currentMedicine =
+                    currentMedicines.find { it.name == event.medicineName }
                 viewModelScope.launch {
-                    repository.removeMedicineByName(event.medicineName)
+                    repository.removeMedicine(currentMedicine ?: Medicine(name = event.medicineName, isSelected = false, id = -1))
                     loadSelectedMedicines()
                 }
 

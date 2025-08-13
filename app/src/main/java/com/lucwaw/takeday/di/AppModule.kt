@@ -2,6 +2,7 @@ package com.lucwaw.takeday.di
 
 import android.content.Context
 import androidx.room.Room
+import com.lucwaw.takeday.data.MIGRATION_1_2
 import com.lucwaw.takeday.data.database.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -18,8 +19,9 @@ class AppModule {
     fun provideUserDatabase(
         @ApplicationContext app: Context
     ) = Room.databaseBuilder(
-        app, AppDatabase::class.java, "AppDatabase"
-    ).build()
+        app, AppDatabase::class.java, "AppDatabase",
+    ).addMigrations(MIGRATION_1_2)
+        .build()
 
     @Singleton
     @Provides

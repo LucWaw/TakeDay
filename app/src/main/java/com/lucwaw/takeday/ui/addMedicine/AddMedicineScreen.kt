@@ -69,9 +69,9 @@ fun AddMedicineScreen(
             // Button to register the medicine
             // Button disabled if the text field is empty or the medicine already exists
             TextField(
-                value = state.medicineName,
+                value = state.medicine.name,
                 onValueChange = { newName ->
-                    onEvent(AddMedicineEvent.MedicineChanged(newName))
+                    onEvent(AddMedicineEvent.MedicineChanged(state.medicine.copy(name = newName)))
                 },
                 label = { Text(stringResource(R.string.medicine_name)) },
                 placeholder = { Text(stringResource(R.string.enter_medicine_name)) },
@@ -81,7 +81,7 @@ fun AddMedicineScreen(
             )
             Button(
                 onClick = { onEvent(AddMedicineEvent.SendMedicine); goBack() },
-                enabled = !state.error && state.medicineName.isNotBlank(),
+                enabled = !state.error && state.medicine.name.isNotBlank(),
                 modifier = Modifier
             ) {
                 Text(stringResource(R.string.add))

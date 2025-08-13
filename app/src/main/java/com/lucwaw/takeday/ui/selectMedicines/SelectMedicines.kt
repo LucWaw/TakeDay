@@ -1,5 +1,6 @@
 package com.lucwaw.takeday.ui.selectMedicines
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,7 +34,11 @@ import com.lucwaw.takeday.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SelectMedicines(goBack: () -> Unit, goToAddMedicine: () -> Unit) {
+fun SelectMedicines(
+    goBack: () -> Unit,
+    goToAddMedicine: () -> Unit,
+    goToMedicineDetails: (Long) -> Unit
+) {
     val viewModel = hiltViewModel<SelectMedicinesViewModel>()
     LaunchedEffect(true) {
         viewModel.loadSelectedMedicines()
@@ -58,6 +63,7 @@ fun SelectMedicines(goBack: () -> Unit, goToAddMedicine: () -> Unit) {
             goToAddMedicine = goToAddMedicine,
             onEvent = viewModel::onEvent,
             state = viewModel.uiState.value,
+            goToMedicineDetails = goToMedicineDetails
         )
     }
 }
@@ -67,14 +73,16 @@ fun SelectMedicinesScreen(
     modifier: Modifier = Modifier,
     goToAddMedicine: () -> Unit,
     state: SelectMedicinesState,
-    onEvent: (SelectMedicinesEvent) -> Unit
+    onEvent: (SelectMedicinesEvent) -> Unit,
+    goToMedicineDetails: (Long) -> Unit
 ) {
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(state.medicines) {
             MedicineItem(
                 medicine = it.name,
                 isSelected = it.isSelected,
-                onEvent = onEvent
+                onEvent = onEvent,
+                goToMedicineDetails = { goToMedicineDetails(it.id) }
             )
         }
         item {
@@ -92,7 +100,8 @@ fun SelectMedicinesScreen(
 fun MedicineItem(
     medicine: String,
     isSelected: Boolean,
-    onEvent: (SelectMedicinesEvent) -> Unit
+    onEvent: (SelectMedicinesEvent) -> Unit,
+    goToMedicineDetails: () -> Unit
 ) {
     var dialogDelete by remember { mutableStateOf(false) }
 
@@ -111,7 +120,8 @@ fun MedicineItem(
             text = medicine,
             modifier = Modifier
                 .padding(8.dp)
-                .width(100.dp),
+                .width(100.dp)
+                .clickable {goToMedicineDetails()},
         )
         IconButton(
             onClick = { dialogDelete = true }

@@ -1,6 +1,7 @@
 package com.lucwaw.takeday.data.database.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Upsert
 import com.lucwaw.takeday.data.database.entities.MedicineEntity
@@ -13,6 +14,9 @@ interface MedicineDao {
     @Upsert
     suspend fun upsert(medicine: MedicineEntity)
 
-    @Query("Delete FROM medicines WHERE name = :medicineName")
-    suspend fun deleteByName(medicineName: String)
+    @Delete
+    suspend fun delete(medicine: MedicineEntity)
+
+    @Query("SELECT * FROM medicines WHERE id = :id")
+    suspend fun getById(id: Long): MedicineEntity?
 }

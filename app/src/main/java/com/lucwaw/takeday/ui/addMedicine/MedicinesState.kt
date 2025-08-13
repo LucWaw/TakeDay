@@ -1,8 +1,9 @@
 package com.lucwaw.takeday.ui.addMedicine
 
+import com.lucwaw.takeday.domain.model.Medicine
+
 data class MedicinesState(
     var error: Boolean = false,
-    var isLoading: Boolean = false,
-    var medicineName: String = "",
-    var medicines: List<String> = emptyList()
+    var medicine: Medicine,
+    var medicines: List<Medicine> = emptyList()
 )

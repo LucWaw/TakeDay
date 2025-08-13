@@ -6,10 +6,12 @@
     <string name="medicine_name">Medicine</string>
     <string name="enter_medicine_name">Enter entire name here</string>
     <string name="add">Add</string>
-    <string name="select_medicines">Select the displayed medications and delete them.</string>
+    <string name="select_medicines">Select the displayed medications, modify them and delete them.</string>
     <string name="delete_medicine">Delete the medicine</string>
     <string name="popup_message_confirmation_delete_medicine">Delete Medicine</string>
     <string name="popup_message_confirmation_delete_medicine_text">This will delete the medication and all associated information, including doses.</string>
     <string name="popup_message_choice_yes">Yes</string>
     <string name="popup_message_choice_no">No</string>
+    <string name="modify_medicine">Modify Medicine</string>
+    <string name="save">Save</string>
 </resources>

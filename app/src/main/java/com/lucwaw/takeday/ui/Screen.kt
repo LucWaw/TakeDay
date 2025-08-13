@@ -10,3 +10,7 @@ object AddMedicine
 
 @Serializable
 object SelectMedicines
+
+@Serializable
+data class MedicineDetails(
+    val medicineId : Long)
