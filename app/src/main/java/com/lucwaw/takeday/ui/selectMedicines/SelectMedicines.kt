@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lucwaw.takeday.R
+import com.lucwaw.takeday.domain.model.Medicine
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,8 +80,7 @@ fun SelectMedicinesScreen(
     LazyColumn(modifier = modifier.fillMaxSize()) {
         items(state.medicines) {
             MedicineItem(
-                medicine = it.name,
-                isSelected = it.isSelected,
+                medicine = it,
                 onEvent = onEvent,
                 goToMedicineDetails = { goToMedicineDetails(it.id) }
             )
@@ -98,8 +98,7 @@ fun SelectMedicinesScreen(
 
 @Composable
 fun MedicineItem(
-    medicine: String,
-    isSelected: Boolean,
+    medicine: Medicine,
     onEvent: (SelectMedicinesEvent) -> Unit,
     goToMedicineDetails: () -> Unit
 ) {
@@ -112,12 +111,12 @@ fun MedicineItem(
     ) {
 
         Checkbox(
-            checked = isSelected,
-            onCheckedChange = { onEvent(SelectMedicinesEvent.MedicineToggle(medicine)) },
+            checked = medicine.isSelected,
+            onCheckedChange = { onEvent(SelectMedicinesEvent.MedicineToggle(medicine.id, !medicine.isSelected)) },
             modifier = Modifier.padding(8.dp)
         )
         Text(
-            text = medicine,
+            text = medicine.name,
             modifier = Modifier
                 .padding(8.dp)
                 .width(100.dp)

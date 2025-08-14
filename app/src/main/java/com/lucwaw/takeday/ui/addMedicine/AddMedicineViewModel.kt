@@ -23,7 +23,7 @@ class AddMedicineViewModel @Inject constructor(private val repository: TableRepo
     var state by mutableStateOf(
         MedicinesState(
             medicine = Medicine(
-                id = 0,//Keep it 0 to avoid conflicts with existing medicines
+                id = 0,// Generate ID will be handled by the database
                 name = "",
                 isSelected = true
             )
@@ -44,7 +44,7 @@ class AddMedicineViewModel @Inject constructor(private val repository: TableRepo
             is AddMedicineEvent.SendMedicine -> {
                 viewModelScope.launch {
 
-                    repository.upsertMedicine(state.medicine)
+                    repository.insertMedicine(state.medicine)
                     state = state.copy(
                         medicines = state.medicines + state.medicine,
                         error = false

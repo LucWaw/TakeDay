@@ -27,7 +27,8 @@ class MedicineDetailsViewModel @Inject constructor(
                 id = -1,
                 name = "",
                 isSelected = false
-            )
+            ),
+            oldName = ""
         )
     )
 
@@ -45,7 +46,8 @@ class MedicineDetailsViewModel @Inject constructor(
                     id = -1,
                     name = "",
                     isSelected = false
-                )
+                ),
+                oldName = medicine?.name ?: "",
             )
 
         }
@@ -58,7 +60,7 @@ class MedicineDetailsViewModel @Inject constructor(
         when (event) {
             is MedicineDetailsEvent.SaveMedicine -> {
                 viewModelScope.launch {
-                    repository.upsertMedicine(uiState.value.medicine)
+                    repository.updateMedicineNameFromId(uiState.value.medicine.id,uiState.value.oldName, uiState.value.medicine.name)
                 }
             }
 
