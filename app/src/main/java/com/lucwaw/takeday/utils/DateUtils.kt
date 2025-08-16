@@ -15,20 +15,11 @@ class DateUtils {
          */
         fun LocalDate.toHumanDate(): String {
             val pattern = when (Locale.getDefault().language) {
-                "fr" -> "dd/MM/yyyy"
+                "fr" -> "E\ndd/MM/yy"
                 else -> "MMMM d, yyyy"
             }
             val formatter = DateTimeFormatter.ofPattern(pattern, Locale.getDefault())
             return this.format(formatter)
         }
-
-        fun dateTimeFormater(): DateTimeFormatter {
-            return when (Locale.getDefault().language) {
-                "fr" -> DateTimeFormatter.ofPattern("dd/MM/yyyy", Locale.getDefault())
-                else -> DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.getDefault())
-            }
-        }
-
-
     }
 }
