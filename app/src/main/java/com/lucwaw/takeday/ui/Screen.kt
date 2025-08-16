@@ -14,3 +14,6 @@ object SelectMedicines
 @Serializable
 data class MedicineDetails(
     val medicineId : Long)
+
+@Serializable
+object TemporaryGraphScreen

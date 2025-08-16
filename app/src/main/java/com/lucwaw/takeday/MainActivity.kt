@@ -11,8 +11,10 @@ import com.lucwaw.takeday.ui.AddMedicine
 import com.lucwaw.takeday.ui.Home
 import com.lucwaw.takeday.ui.MedicineDetails
 import com.lucwaw.takeday.ui.SelectMedicines
+import com.lucwaw.takeday.ui.TemporaryGraphScreen
 import com.lucwaw.takeday.ui.addMedicine.AddMedicineScreenRoot
 import com.lucwaw.takeday.ui.dailies.DailiesScreenRoot
+import com.lucwaw.takeday.ui.draw.DrawScreen
 import com.lucwaw.takeday.ui.medicineDetails.MedicineDetailsScreenRoot
 import com.lucwaw.takeday.ui.selectMedicines.SelectMedicines
 import com.lucwaw.takeday.ui.theme.TakeDayTheme
@@ -30,7 +32,7 @@ class MainActivity : ComponentActivity() {
 
                 val navController = rememberNavController()
 
-                NavHost(navController = navController, startDestination = Home) {
+                NavHost(navController = navController, startDestination = TemporaryGraphScreen) {//TODO CHANGE TO HOME
                     composable<Home> {
                         DailiesScreenRoot(
                             goToAddScreen =
@@ -70,6 +72,9 @@ class MainActivity : ComponentActivity() {
                         } else {
                             // Handle the case where medicineName is null
                         }
+                    }
+                    composable<TemporaryGraphScreen> {
+                        DrawScreen()
                     }
                 }
 
