@@ -7,6 +7,8 @@ val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)
 val Pink = Color(0xFFFF80ca)
 val DarkGrey = Color(0xFF4A4747)
+val BarColor = Color.Yellow
+val PathColor = Color.Magenta
 
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)

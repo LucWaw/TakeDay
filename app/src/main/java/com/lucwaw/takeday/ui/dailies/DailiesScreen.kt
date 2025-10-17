@@ -54,7 +54,11 @@ import java.time.LocalTime
 import java.util.Locale
 
 @Composable
-fun DailiesScreenRoot(goToAddScreen: () -> Unit, goToSelectMedicines: () -> Unit) {
+fun DailiesScreenRoot(
+    goToAddScreen: () -> Unit,
+    goToSelectMedicines: () -> Unit,
+    goToDiagram: () -> Unit
+) {
     val viewModel = hiltViewModel<TableViewModel>()
     LaunchedEffect(true) {
         viewModel.updateTable()
@@ -63,6 +67,7 @@ fun DailiesScreenRoot(goToAddScreen: () -> Unit, goToSelectMedicines: () -> Unit
         state = viewModel.uiState.value,
         gotToAddScreen = goToAddScreen,
         goToSelectMedicines = goToSelectMedicines,
+        goToDiagram = goToDiagram,
         onEvent = viewModel::onEvent
     )
 }
@@ -73,13 +78,14 @@ fun DailiesScreen(
     state: UiState,
     gotToAddScreen: () -> Unit,
     goToSelectMedicines: () -> Unit,
+    goToDiagram: () -> Unit,
     onEvent: (TableEvent) -> Unit
 ) {
 
 
     Scaffold(
-        topBar = {
-            TopAppBar(
+                topBar = {
+                TopAppBar(
                 title = {
                     Text(stringResource(R.string.app_name))
                 },
@@ -103,6 +109,18 @@ fun DailiesScreen(
 
                         Icon(
                             painter = painterResource(R.drawable.splitscreen_vertical_add),
+                            contentDescription = stringResource(R.string.select_medicines),
+                        )
+                    }
+                    IconButton(
+                        onClick =
+                            {
+                                goToDiagram()
+                            }
+                    ) {
+
+                        Icon(
+                            painter = painterResource(R.drawable.data_thresholding),
                             contentDescription = stringResource(R.string.select_medicines),
                         )
                     }

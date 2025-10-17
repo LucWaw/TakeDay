@@ -44,6 +44,9 @@ class MainActivity : ComponentActivity() {
                                 },
                             goToSelectMedicines = {
                                 navController.navigate(SelectMedicines)
+                            },
+                            goToDiagram = {
+                                navController.navigate(TemporaryGraphScreen)
                             }
                         )
                     }
@@ -75,7 +78,9 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     composable<TemporaryGraphScreen> {
-                        DrawScreen()
+                        DrawScreen(
+                            onBackClick = { navController.popBackStack() }
+                        )
                     }
                 }
 
