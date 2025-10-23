@@ -9,6 +9,8 @@ val Pink = Color(0xFFFF80ca)
 val DarkGrey = Color(0xFF4A4747)
 val BarColor = Color.Yellow
 val PathColor = Color.Magenta
+val TakeChartPrimary = Color.Black
+val TakeChartSecondary = Color.White
 
 val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)

@@ -2,9 +2,13 @@ package com.lucwaw.takeday.ui.draw
 
 import android.graphics.PointF
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.remember
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -14,27 +18,111 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.asAndroidPath
+import androidx.compose.ui.graphics.asComposePath
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.unit.dp
 import com.lucwaw.takeday.ui.theme.BarColor
 import com.lucwaw.takeday.ui.theme.PathColor
+import java.time.LocalDate
+import java.time.LocalTime
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.component3
+import kotlin.math.roundToInt
+import kotlin.text.get
+/*
+@Composable
+fun DrawRoot(onBackClick: () -> Boolean) {
+    TakeDateGraphPrototype(onBackClick = onBackClick)
+}
+
+
+data class Take(
+    val date : LocalDate = LocalDate.now(),
+    val time : LocalTime = LocalTime.now(), //SleepDayData
+    val taken : Boolean = true              //SleepDayData
+)
+
+
+
 
 @Composable
-fun DrawRoot(onBackClick: () -> Unit) {
-    DrawScreen(onBackClick = onBackClick)
+private fun TakeDateGraph(onBackClick : () -> Boolean, takeDayGraphData: List<Take>, modifier: Modifier = Modifier) {
+    TODO IN first : scaffold with on back click
+    val scrollState = rememberScrollState()
+
+    val hours = (1..23).toList()
+
+    TimeGraph(
+        modifier = modifier
+            .horizontalScroll(scrollState)
+            .wrapContentSize(),
+        dayItemsCount = 7,
+        hoursHeader = {
+            HoursHeader(hours)
+        },
+        dayLabel = { index -> //Week index
+            DayLabel(takeDayGraphData[takeDayGraphData.size-7 + index].date.dayOfWeek)
+        },
+        bar = {index ->
+            val data = takeDayGraphData[takeDayGraphData.size-7 + index]
+            // We have access to Modifier.timeGraphBar() as we are now in TimeGraphScope
+            TakePoint(
+                sleepData = data,
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .timeGraphBar(
+                        start = data.firstSleepStart,
+                        end = data.lastSleepEnd,
+                        hours = hours,
+                    ),
+            )
+
+        },
+        line = {
+            // We have access to Modifier.timeGraphBar() as we are now in TimeGraphScope
+            val VAPORWAVE_PINK = Color(0xFFFF71CE)
+            val VAPORWAVE_BLUE = Color(0xFF01CDFE)
+            val lineBrush = remember {
+                Brush.verticalGradient(
+                    listOf(VAPORWAVE_PINK, VAPORWAVE_BLUE)
+                )
+            }
+
+            val points = remember(takeDayGraphData) {
+                takeDayGraphData.map { it.firstSleepStart }
+            }
+            TimeGraphLine(
+                points = points,
+                hours = hours,
+                brush = lineBrush,
+                // Optional: add a smooth curve
+                grapher = { a, b, c, d, e, f, g ->
+                    quadTo(a,b,c,d)
+                    //cubicTo(a,b,c,d,e,f)
+                }
+            )
+        }
+    )
 }
+
+/*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DrawScreen(
+fun DrawScreenPrototype(
     modifier: Modifier = Modifier,
-    onBackClick: () -> Unit,
+    onBackClick: () -> Boolean,
 ) {
     val graphData : List<Balance> = listOf(Balance(1),Balance(3),Balance(4),Balance(2),Balance(3),Balance(5))
     Scaffold(
@@ -42,7 +130,7 @@ fun DrawScreen(
             TopAppBar(
                 title = { Text(text = "Draw") },
                 navigationIcon = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(onClick = { onBackClick() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -104,7 +192,7 @@ fun DrawScreen(
 
 data class Balance(val amount: Int)
 
-
+*/
 // A new data class to hold all points for a single curve segment
 data class PathPoints(
     val balanceX: Float,
@@ -151,4 +239,4 @@ fun generateSmoothPathWithPoints(data: List<Balance>, size: Size): Pair<Path, Li
         previousBalanceY = balanceY
     }
     return Pair(path, points)
-}
+}*/
