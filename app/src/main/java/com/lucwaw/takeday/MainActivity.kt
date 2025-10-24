@@ -15,6 +15,7 @@ import com.lucwaw.takeday.ui.SelectMedicines
 import com.lucwaw.takeday.ui.TemporaryGraphScreen
 import com.lucwaw.takeday.ui.addMedicine.AddMedicineScreenRoot
 import com.lucwaw.takeday.ui.dailies.DailiesScreenRoot
+import com.lucwaw.takeday.ui.draw.DrawRoot
 import com.lucwaw.takeday.ui.medicineDetails.MedicineDetailsScreenRoot
 import com.lucwaw.takeday.ui.selectMedicines.SelectMedicines
 import com.lucwaw.takeday.ui.theme.TakeDayTheme
@@ -77,9 +78,9 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     composable<TemporaryGraphScreen> {
-                        /*DrawScreen(
+                        DrawRoot(
                             onBackClick = { navController.popBackStack() }
-                        )*/
+                        )
                     }
                 }
 

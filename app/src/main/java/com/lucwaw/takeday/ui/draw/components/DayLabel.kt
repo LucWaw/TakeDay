@@ -1,4 +1,4 @@
-package com.lucwaw.takeday.ui.draw
+package com.lucwaw.takeday.ui.draw.components
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -11,6 +11,7 @@ import com.lucwaw.takeday.ui.theme.SmallHeadingStyle
 import java.time.DayOfWeek
 import java.time.format.TextStyle
 import java.util.Locale
+
 
 @Composable
 fun DayLabel(dayOfWeek: DayOfWeek) {

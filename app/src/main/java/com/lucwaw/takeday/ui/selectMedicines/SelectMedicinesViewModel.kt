@@ -25,10 +25,6 @@ class SelectMedicinesViewModel @Inject constructor(
 
     val uiState: State<SelectMedicinesState> = _uiState
 
-    init {
-        loadSelectedMedicines()
-    }
-
     fun loadSelectedMedicines() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(

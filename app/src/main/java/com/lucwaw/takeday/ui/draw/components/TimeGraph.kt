@@ -1,4 +1,4 @@
-package com.lucwaw.takeday.ui.draw
+package com.lucwaw.takeday.ui.draw.components
 
 import androidx.compose.foundation.layout.LayoutScopeMarker
 import androidx.compose.foundation.layout.padding
@@ -12,13 +12,8 @@ import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.temporal.ChronoUnit
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.component3
 import kotlin.math.roundToInt
-/*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -51,7 +46,6 @@ fun TimeGraph(
         var totalHeight = hoursHeaderPlaceable.height
 
 
-
         val totalWidth = dayLabelPlaceables.first().width + hoursHeaderPlaceable.width
 
         layout(totalWidth, totalHeight) {
@@ -60,6 +54,17 @@ fun TimeGraph(
 
             hoursHeaderPlaceable.place(xPosition, 0)
 
+            barPlaceables.forEachIndexed { index, barPlaceable ->
+                val barParentData = barPlaceable.parentData as com.example.jetlagged.sleep.TimeGraphParentData
+                val barOffset = (barParentData.offset * hoursHeaderPlaceable.width).roundToInt()
+
+                barPlaceable.place(xPosition + barOffset, yPosition)
+                // the label depend on the size of the bar content - so should use the same y
+                val dayLabelPlaceable = dayLabelPlaceables[index]
+                dayLabelPlaceable.place(x = 0, y = yPosition)
+
+                yPosition += barPlaceable.height
+            }
         }
     }
 }
@@ -82,6 +87,7 @@ object TimeGraphScope {
             ),
         )
     }
+
     @Stable
     fun Modifier.timeGraphLine(List<>) {
     }
@@ -91,4 +97,3 @@ class TimeGraphParentData(val duration: Float, val offset: Float) : ParentDataMo
     override fun Density.modifyParentData(parentData: Any?) = this@TimeGraphParentData
 }
 
-*/

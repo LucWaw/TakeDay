@@ -290,16 +290,14 @@ fun TableContent(
 
                         else -> {
 
-                            var localToggleableState by remember(row.medicines[header]) { mutableStateOf(row.medicines[header]?.let {
-                                when (it) {
-                                    TriState.TAKEN -> ToggleableState.On
-                                    TriState.NOTTAKEN -> ToggleableState.Indeterminate
-                                    TriState.EMPTY -> ToggleableState.Off
-                                }
-                            } ?: ToggleableState.Off) }
+                            val (toggleableState, color) = when (row.medicines[header]) {
+                                TriState.TAKEN -> ToggleableState.On to Color.Green
+                                TriState.NOTTAKEN -> ToggleableState.Indeterminate to Color.Red
+                                else -> ToggleableState.Off to Color.Unspecified
+                            }
 
                             TriStateCheckbox(
-                                state = localToggleableState,
+                                state = toggleableState,
                                 onClick = {
                                     onEvent(
                                         TableEvent.NoteMedicine(
@@ -315,7 +313,7 @@ fun TableContent(
                                     )
 
                                 }, colors = CheckboxDefaults.colors(
-                                    checkedColor = if (localToggleableState == ToggleableState.Indeterminate) Color.Red else Color.Unspecified
+                                    checkedColor = color
                                 ),
                                 modifier = modifierItems
                                     .padding(8.dp)

@@ -14,4 +14,5 @@
     <string name="popup_message_choice_no">Non</string>
     <string name="modify_medicine">Modifier le médicament</string>
     <string name="save">Sauvegarder</string>
+    <string name="dose_time_graph">Graphique des doses par heure</string>
 </resources>

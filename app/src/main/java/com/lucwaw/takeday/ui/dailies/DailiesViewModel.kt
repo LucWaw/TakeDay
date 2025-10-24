@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lucwaw.takeday.domain.model.Row
 import com.lucwaw.takeday.domain.model.TriState
+import com.lucwaw.takeday.domain.usecase.GenerateCompleteRowsUseCase
 import com.lucwaw.takeday.repository.TableRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -23,22 +24,20 @@ sealed class TableEvent {
 }
 
 @HiltViewModel
-class TableViewModel @Inject constructor(private val repository: TableRepository) : ViewModel() {
+class TableViewModel @Inject constructor(
+    private val generateCompleteRowsUseCase: GenerateCompleteRowsUseCase,
+    private val repository: TableRepository) : ViewModel() {
     private val _uiState = mutableStateOf(
         UiState()
     )
 
     val uiState: State<UiState> = _uiState
 
-    init {
-        updateTable()
-    }
-
     fun updateTable() {
         viewModelScope.launch {
             val rows = repository.getAllRows()
             // Create rows for each day from the first row to today, including today
-            val completeRows = createUnExistingRowsFromUsageBeginningToToDay(rows)
+            val completeRows = generateCompleteRowsUseCase(rows)
 
             val medicineHeaders =
                 repository.getAllMedicines().filter { it.isSelected }.map { it.name }
@@ -51,35 +50,7 @@ class TableViewModel @Inject constructor(private val repository: TableRepository
     }
 
 
-    /**
-     * Creates a list of [Row] objects, filling in any missing dates between the earliest date
-     * present in the input `rows` and today's date.
-     *
-     * If a date within this range is not found in the input `rows`, a new [Row] is created for that date
-     * with `null` time and an empty map for medicines.
-     *
-     * If the input `rows` is empty, it will generate rows from today up to today (i.e., a single row for today).
-     *
-     * @param rows A list of existing [Row] objects, potentially with missing dates.
-     * @return A new list of [Row] objects that includes all dates from the earliest date in the input `rows`
-     * (or today if `rows` is empty) up to and including today. Existing rows are preserved, and missing
-     * dates are filled with default [Row] objects.
-     */
-    fun createUnExistingRowsFromUsageBeginningToToDay(rows: List<Row>): List<Row> {
-        val today = LocalDate.now()
-        val rowsByDate = rows.associateBy { it.date }
-        val startDate = rows.minOfOrNull { it.date } ?: today
 
-        return (0..today.toEpochDay() - startDate.toEpochDay()).reversed() // Include today
-            .map { startDate.plusDays(it) }
-            .map { currentDate ->
-                rowsByDate[currentDate] ?: Row(
-                    date = currentDate,
-                    time = null,
-                    medicines = emptyMap() // No medicine
-                )
-            }
-    }
 
 
     fun onEvent(event: TableEvent) {
