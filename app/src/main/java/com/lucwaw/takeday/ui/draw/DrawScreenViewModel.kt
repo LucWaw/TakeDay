@@ -23,12 +23,15 @@ class DrawScreenViewModel @Inject constructor(
 
     fun updateTable() {
         viewModelScope.launch {
+            _uiState.value = UiGraphState(isLoading = true)
+
             val rows = repository.getAllRows()
             // Create rows for each day from the first row to today, including today
             val completeRows = generateCompleteRowsUseCase(rows)
 
             _uiState.value = UiGraphState(
-                table = completeRows
+                table = completeRows,
+                isLoading = false
             )
         }
     }

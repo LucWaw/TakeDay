@@ -2,14 +2,16 @@ package com.lucwaw.takeday.ui.draw
 
 import android.graphics.PointF
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,12 +20,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -31,13 +32,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lucwaw.takeday.R
-import com.lucwaw.takeday.domain.model.Row
 import com.lucwaw.takeday.domain.model.TriState
+import com.lucwaw.takeday.ui.draw.components.DayLabel
+import com.lucwaw.takeday.ui.draw.components.HoursHeader
 import com.lucwaw.takeday.ui.draw.components.TakePoint
 import com.lucwaw.takeday.ui.draw.components.TimeGraph
+import com.lucwaw.takeday.ui.draw.components.TimeGraphScope.timeGraphPoint
 import com.lucwaw.takeday.ui.theme.BarColor
 import com.lucwaw.takeday.ui.theme.PathColor
-import java.time.LocalTime
+import java.time.LocalDateTime
 
 @Composable
 fun DrawRoot(onBackClick: () -> Boolean) {
@@ -46,7 +49,7 @@ fun DrawRoot(onBackClick: () -> Boolean) {
         viewModel.updateTable()
     }
 
-    TakeDateGraph(onBackClick = onBackClick, takeDayGraphData = viewModel.uiState.value.table)
+    TakeDateGraph(onBackClick = onBackClick, uiState = viewModel.uiState.value)
 }
 
 
@@ -54,7 +57,7 @@ fun DrawRoot(onBackClick: () -> Boolean) {
 @Composable
 private fun TakeDateGraph(
     onBackClick: () -> Boolean,
-    takeDayGraphData: List<Row>,
+    uiState: UiGraphState,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -75,36 +78,47 @@ private fun TakeDateGraph(
             )
         }
     ) { innerPadding ->
-        //DrawPointsAndLine(modifier = Modifier.padding(innerPadding))        //Take the last seven days and map it to take
-        val scrollState = rememberScrollState()
+        if (uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else if (uiState.table.isNotEmpty()) {
+            val hours = (1..23).toList()
+            val scrollState = rememberScrollState()
 
-        val hours = (1..23).toList()
+            TimeGraph(
+                modifier = modifier
+                    .verticalScroll(scrollState)
+                    .wrapContentSize()
+                    .padding(innerPadding),
+                dayItemsCount = 7,
+                hoursHeader = {
+                    HoursHeader(hours)
+                },
+                dayLabel = { index -> //Week index
+                    DayLabel(uiState.table[uiState.table.size - 7 + index].date.dayOfWeek)
+                },
+                point = { index ->
+                    val data = uiState.table[uiState.table.size - 7 + index]
+                    // We have access to Modifier.timeGraphBar() as we are now in TimeGraphScope
+                    if (data.time != null) {
+                        TakePoint(
+                            data = data,
+                            modifier = Modifier
+                                .padding(bottom = 8.dp)
+                                .timeGraphPoint(
+                                    pointOfTime = LocalDateTime.of(data.date, data.time),
+                                    hours = hours
+                                ),
+                        )
+                    } else{
+                        Box(modifier = modifier.timeGraphPoint(pointOfTime = LocalDateTime.now(), hours = hours)) {  }
+                    }
 
-        TimeGraph(
-            modifier = modifier
-                .wrapContentSize(),
-            dayItemsCount = 7,
-            hoursHeader = {
-                HoursHeader(hours)
-            },
-            dayLabel = { index -> //Week index
-                DayLabel(takeDayGraphData[takeDayGraphData.size-7 + index].date.dayOfWeek)
-            },
-            bar = {index ->
-                val data = takeDayGraphData[takeDayGraphData.size-7 + index]
-                // We have access to Modifier.timeGraphBar() as we are now in TimeGraphScope
-                TakePoint(
-                    sleepData = data,
-                    modifier = Modifier
-                        .padding(bottom = 8.dp)
-                        .timeGraphBar(
-                            start = data.firstSleepStart,
-                            end = data.lastSleepEnd,
-                            hours = hours,
-                        ),
-                )
-
-            },
+                }/*,
             line = {
                 // We have access to Modifier.timeGraphBar() as we are now in TimeGraphScope
                 val VAPORWAVE_PINK = Color(0xFFFF71CE)
@@ -128,8 +142,10 @@ private fun TakeDateGraph(
                         //cubicTo(a,b,c,d,e,f)
                     }
                 )
-            }
-        )
+            }*/
+            )
+        }
+
     }
 }
 
@@ -152,7 +168,7 @@ data class Take(
 @Composable
 fun DrawPointsAndLine(
     modifier: Modifier = Modifier,
-    graphData : List<Take> = fakeGraphData
+    graphData: List<Take> = fakeGraphData
 ) {
 
     Canvas(

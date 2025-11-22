@@ -1,6 +1,8 @@
 package com.lucwaw.takeday.ui.draw.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.LayoutScopeMarker
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -12,88 +14,120 @@ import androidx.compose.ui.layout.ParentDataModifier
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import kotlin.math.roundToInt
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun TimeGraph(
     hoursHeader: @Composable () -> Unit,
     dayItemsCount: Int,
     dayLabel: @Composable (index: Int) -> Unit,
-    points: @Composable TimeGraphScope.(index: Int) -> Unit,
+    point: @Composable TimeGraphScope.(index: Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val dayLabels = @Composable { repeat(dayItemsCount) { dayLabel(it) } }
-    val bars = @Composable { repeat(dayItemsCount) { TimeGraphScope.points(it) } }
+    val points = @Composable { repeat(dayItemsCount) { TimeGraphScope.point(it) } }
     Layout(
-        contents = listOf(hoursHeader, dayLabels, bars),
-        modifier = modifier.padding(bottom = 32.dp),
+        contents = listOf(dayLabels, hoursHeader, points),
+        modifier = modifier.padding(start = 32.dp),
     ) {
-            (hoursHeaderMeasurables, dayLabelMeasurables, barMeasureables),
+            (dayLabelMeasurables, hoursHeaderMeasurables, pointMeasureables),
             constraints,
         ->
+
         require(hoursHeaderMeasurables.size == 1) {
             "hoursHeader should only emit one composable"
         }
+        // The hours header determines the height of our graph timeline
         val hoursHeaderPlaceable = hoursHeaderMeasurables.first().measure(constraints)
 
+        // Day labels are now at the top, measure them individually
         val dayLabelPlaceables = dayLabelMeasurables.map { measurable ->
-            val placeable = measurable.measure(constraints)
-            placeable
+            measurable.measure(constraints)
         }
 
-        var totalHeight = hoursHeaderPlaceable.height
+        // Each column (day) will have the width of its label
+        val dayWidths = dayLabelPlaceables.map { it.width }
 
+        // The points (circles) will determine their own size, so we measure them freely
+        val pointPlaceables = pointMeasureables.map { measurable ->
+            measurable.measure(constraints)
+        }
+        Log.d("AAAA", pointMeasureables.toString())
+        Log.d("BBBB", dayItemsCount.toString())
 
-        val totalWidth = dayLabelPlaceables.first().width + hoursHeaderPlaceable.width
+        // Total width is the sum of all day label widths plus the width of the hours header on the left
+        val totalWidth = dayWidths.sum() + hoursHeaderPlaceable.width
+
+        // Total height is the taller of the hours header or the highest day label
+        val totalHeight = maxOf(
+            hoursHeaderPlaceable.height,
+            dayLabelPlaceables.maxOfOrNull { it.height } ?: 0
+        )
 
         layout(totalWidth, totalHeight) {
-            val xPosition = dayLabelPlaceables.first().width
-            var yPosition = hoursHeaderPlaceable.height
+            var xPosition = hoursHeaderPlaceable.width
 
-            hoursHeaderPlaceable.place(xPosition, 0)
+            // Place the hours header on the far left
+            hoursHeaderPlaceable.place(x = xPosition /2, y = 0)
 
-            barPlaceables.forEachIndexed { index, barPlaceable ->
-                val barParentData = barPlaceable.parentData as com.example.jetlagged.sleep.TimeGraphParentData
-                val barOffset = (barParentData.offset * hoursHeaderPlaceable.width).roundToInt()
+            // Place each day's content (label and point) in its own column
+            pointPlaceables.forEachIndexed { index, pointPlaceable ->
+                val dayLabel = dayLabelPlaceables[index]
+                val dayWidth = dayWidths[index]
 
-                barPlaceable.place(xPosition + barOffset, yPosition)
-                // the label depend on the size of the bar content - so should use the same y
-                val dayLabelPlaceable = dayLabelPlaceables[index]
-                dayLabelPlaceable.place(x = 0, y = yPosition)
+                // Place the day's label at the top of its column
+                dayLabel.place(x = xPosition, y = 0)
 
-                yPosition += barPlaceable.height
+                // Get the vertical offset data for the point
+                val pointParentData = pointPlaceable.parentData as TimeGraphParentData
+
+                // Calculate the Y position based on the percentage offset and the timeline height
+                val yOffset = (pointParentData.yOffsetPercent * hoursHeaderPlaceable.height).roundToInt()
+
+                // To center the point in its column, offset by half the label width minus half the point width
+                val centeredX = xPosition + (dayWidth / 2) - (pointPlaceable.width / 2)
+
+                // Place the point
+                pointPlaceable.place(x = centeredX, y = yOffset)
+
+                // Move xPosition to the start of the next column
+                xPosition += dayWidth
             }
         }
     }
 }
 
-
 @LayoutScopeMarker
 @Immutable
 object TimeGraphScope {
     @Stable
-    fun Modifier.timeGraphPoint(date: LocalDateTime): Modifier {
-        val durationInHours = ChronoUnit.MINUTES.between(start, end) / 60f
-        val durationFromEarliestToStartInHours =
-            ChronoUnit.MINUTES.between(earliestTime, start.toLocalTime()) / 60f
-        // we add extra half of an hour as hour label text is visually centered in its slot
-        val offsetInHours = durationFromEarliestToStartInHours + 0.5f
+    // Modifier name and parameters are updated for clarity
+    fun Modifier.timeGraphPoint(
+        pointOfTime: LocalDateTime,
+        hours: List<Int>
+    ): Modifier {
+        // This logic now calculates a vertical percentage (0.0 to 1.0)
+        val earliestTime = LocalTime.of(hours.first(), 0)
+        val latestTime = LocalTime.of(hours.last(), 0)
+
+        val totalDurationInMinutes = ChronoUnit.MINUTES.between(earliestTime, latestTime).toFloat()
+        val pointTimeInMinutes = ChronoUnit.MINUTES.between(earliestTime, pointOfTime.toLocalTime()).toFloat()
+
+        // Calculate the offset as a percentage of the total duration
+        val yOffsetPercent = (pointTimeInMinutes / totalDurationInMinutes).coerceIn(0f, 1f)
+
         return this.then(
             TimeGraphParentData(
-                duration = durationInHours / hours.size,
-                offset = offsetInHours / hours.size,
-            ),
+                yOffsetPercent = yOffsetPercent
+            )
         )
-    }
-
-    @Stable
-    fun Modifier.timeGraphLine(List<>) {
     }
 }
 
-class TimeGraphParentData(val duration: Float, val offset: Float) : ParentDataModifier {
+// The ParentData class is now much simpler
+class TimeGraphParentData(val yOffsetPercent: Float) : ParentDataModifier {
     override fun Density.modifyParentData(parentData: Any?) = this@TimeGraphParentData
 }
 
