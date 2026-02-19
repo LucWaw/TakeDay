@@ -6,3 +6,7 @@
 
 
 Application mobile de suivi des prises de médicaments
+
+## En cours de développement
+
+Un graphique permettant de visualiser l'évolution de l'heure de la prise dans le temps avec gestion des cas limite (pas d'heure, état des médicaments, heure uniquement...).
