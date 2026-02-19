@@ -4,8 +4,8 @@
     <img src="images/1.png" alt="tableau principal des prises" width="200">
 <h3 align="center">Ecran Principal</h3>
 
-
 Application mobile de suivi des prises de médicaments
+</div>
 
 ## En cours de développement
 
